@@ -1,4 +1,7 @@
 importKDPReport <- function(filename,finalCurrency = 'USD'){
+  
+  library('plyr')
+  library('quantmod')
   # read relevant KDP columns, add country of sale as a column, and combine data
   # filename = 'kdp-report-1-2016.csv'
   # finalCurrency = 'USD'
