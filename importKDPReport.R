@@ -3,7 +3,7 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
   library('plyr')
   library('quantmod')
   # read relevant KDP columns, add country of sale as a column, and combine data
-  # filename = 'kdp-report-1-2016.csv'
+# filename = 'kdp-report-1-2016.csv'
   # finalCurrency = 'USD'
   contents = read.csv(filename);
   contents$Period = "";
@@ -86,7 +86,7 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
   contents$KENPRead = contents$Net.Units.Sold.or.KENP.Read...1.
   contents[!is.na(contents$UnitsSold),]$KENPRead = NA
   
-  dates = as.character(as.Date(with(contents,paste0("15 ",Period)),
+  dates = as.character(as.Date(with(contents,paste0("28 ",Period)),
                                format=paste("%d ", periodFormatStr)))
   uniquedates = unique(dates)
   
