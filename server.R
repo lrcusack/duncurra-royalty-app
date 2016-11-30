@@ -23,9 +23,10 @@ shinyServer(function(input, output, session) {
     if (is.null((input$file)))
       return(NULL)
     titlesummary = generateSummary(kdp(),
-                                        input$authorselect,
-                                        input$titleselect,
-                                        sumperiods = input$sumperiods)
+                                   input$authorselect,
+                                   input$titleselect,
+                                   sumperiods = input$sumperiods,
+                                   currency = finalcurrency())
     updatetitlelist()
     return(titlesummary)
     
@@ -35,9 +36,9 @@ shinyServer(function(input, output, session) {
     if (is.null((input$file)))
       return(NULL)
     authorsummary = generateSummary(kdp(),
-                                          input$authorsummaryselect,
-                                          sumperiods = input$sumperiods,
-                                          sumtitles = TRUE,
+                                    input$authorsummaryselect,
+                                    sumperiods = input$sumperiods,
+                                    sumtitles = TRUE,
                                     currency = finalcurrency())
     return(authorsummary)
   })
