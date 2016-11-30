@@ -1,7 +1,8 @@
 generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
-                                 sumperiods = FALSE,
-                                 sumtitles = FALSE,
-                                 sumauthors = FALSE){
+                            sumperiods = FALSE,
+                            sumtitles = FALSE,
+                            sumauthors = FALSE,
+                            currency = 'USD'){
   if (is.null(Authors)){
     Authors = unique(kdp$Author)
   }
@@ -83,14 +84,24 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
   
   
   colorder = intersect(c('Title','Author','Royalty','BookRoyalty',
-               'BooksSold','KENPRoyalty','PagesRead','Period'),
-               names(as))
+                         'BooksSold','KENPRoyalty','PagesRead','Period'),
+                       names(as))
   as = as[,colorder]
   
   
   financeCols = c('Royalty','KENPRoyalty','BookRoyalty')
+  currSymbol = switch (currency,
+    'USD' = '$',
+    'NZD' = '$',
+    'AUD' = '$',
+    'CAD' = '$',
+    'AUD' = '$',
+    'GBP' = '\u00A3',
+    'EUR' = '\u20AC',
+    currency
+  )
   for (col in financeCols){
-    as[,col] = paste('$',format(round(as[,col],digits=2),nsmall=2),sep="")
+    as[,col] = paste(currSymbol,format(round(as[,col],digits=2),nsmall=2),sep="")
   }
   
   

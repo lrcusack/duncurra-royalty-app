@@ -86,8 +86,21 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
   contents$KENPRead = contents$Net.Units.Sold.or.KENP.Read...1.
   contents[!is.na(contents$UnitsSold),]$KENPRead = NA
   
-  dates = as.character(as.Date(with(contents,paste0("28 ",Period)),
-                               format=paste("%d ", periodFormatStr)))
+  datenums = as.Date(paste("28 ",contents$Period),
+                     format=paste("%d ", periodFormatStr))
+  dates = rep(NA,length(datenums))
+  for (i in 1:length(datenums)){
+    exchangedate = as.Date(paste("28 ",format(datenums[[i]]+(2*28)
+                                              ,format = periodFormatStr)),
+                           format = paste("%d ", periodFormatStr));
+    if (exchangedate >= Sys.Date())
+      dates[[i]] = as.character(Sys.Date()-1)
+    else{
+      dates[[i]] = as.character(exchangedate)
+    }
+  }
+  
+  
   uniquedates = unique(dates)
   
   exchangeString = with(contents,paste0(OrigCurrency,"/",FinalCurrency))
@@ -96,20 +109,29 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
   conversion = c();
   date = c();
   rate = c();
+  period = c();
   
   for(ex in exchanges){
     for(d in uniquedates){
       conversion = c(conversion,ex)
       date = c(date,d)
-      rate = c(rate,getFX(ex,from=d,to=d,auto.assign = FALSE)[[1]])
+      period = format(d,format=periodFormatStr)
+      rate = c(rate,getFX(ex,from=as.Date(d),to=as.Date(d),auto.assign = FALSE)[[1]])
     }
   }
-  exchangeTable = data.frame(conversion,date,rate)
+  period = as.factor(period)
+  exchangeTable = data.frame(period,date,conversion,rate)
+  contents$ExchangeRate = NA
+  contents$ExchangeDate = NA
+  contents$Exchange = NA
   for(i in 1:nrow(exchangeTable)){
     matchidx = (dates==exchangeTable$date[[i]] 
                 & exchangeString==exchangeTable$conversion[[i]])
     contents[matchidx,]$Royalty.inFinalCurrency = 
       exchangeTable$rate[[i]] * contents[matchidx,]$Royalty.inOrigCurrency
+    contents[matchidx,]$ExchangeRate = exchangeTable$rate[[i]]
+    contents[matchidx,]$ExchangeDate = as.character(exchangeTable$date[[i]])
+    contents[matchidx,]$Exchange = as.character(exchangeTable$conversion[[i]])
   }
   
   factorColumns = c("Period","Country","OrigCurrency","FinalCurrency");
@@ -127,6 +149,9 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
                "Country",
                "Royalty.inOrigCurrency",
                "OrigCurrency",
+               "Exchange",
+               "ExchangeRate",
+               "ExchangeDate",
                "Royalty.inFinalCurrency",
                "FinalCurrency",
                "RoyaltyType",

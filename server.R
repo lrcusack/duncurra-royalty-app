@@ -3,7 +3,14 @@ source('generateSummary.R')
 
 library('shiny')
 
+
 shinyServer(function(input, output, session) {
+  
+  finalcurrency = reactive({
+    fcname = input$finalcurrency
+    currencies = getCurrencies()
+    return(as.character(currencies[fcname==currencies$names,'symbols']))
+  })
   
   updatetitlelist = reactive({
     titles = unique(kdp()[is.element(kdp()$Author,input$authorselect),'Title'])
@@ -30,7 +37,8 @@ shinyServer(function(input, output, session) {
     authorsummary = generateSummary(kdp(),
                                           input$authorsummaryselect,
                                           sumperiods = input$sumperiods,
-                                          sumtitles = TRUE)
+                                          sumtitles = TRUE,
+                                    currency = finalcurrency())
     return(authorsummary)
   })
   
@@ -40,7 +48,11 @@ shinyServer(function(input, output, session) {
     if (is.null(inFile))
       return(NULL)
     
-    val <<- importKDPReport(inFile$datapath)
+    val = data.frame()
+    ex = data.frame()
+    for (path in inFile$datapath){
+      val = rbind(val,importKDPReport(path,finalCurrency = finalcurrency()))
+    }
     
     updateSelectInput(session,'authorsummaryselect',
                       choices=unique(val$Author))
@@ -52,10 +64,10 @@ shinyServer(function(input, output, session) {
     return(val)
   })
   
-
+  
   
   output$contents <- renderDataTable({
-    data = kdp()
+    data = getExchangeTable(kdp())
   })
   
   output$summary <-  renderDataTable({
@@ -66,7 +78,7 @@ shinyServer(function(input, output, session) {
     data = titleSummaryTable()
   })
   
-  output$table <- renderPrint({
-    summary(cars)
+  output$rawdata <- renderDataTable({
+    data = kdp()
   })
 })
