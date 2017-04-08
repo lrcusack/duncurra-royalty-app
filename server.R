@@ -1,6 +1,7 @@
 source('importKDPReport.R')
 source('generateSummary.R')
 
+require('curl')
 library('shiny')
 
 

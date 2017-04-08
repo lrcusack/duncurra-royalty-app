@@ -116,7 +116,8 @@ importKDPReport <- function(filename,finalCurrency = 'USD'){
       conversion = c(conversion,ex)
       date = c(date,d)
       period = format(d,format=periodFormatStr)
-      rate = c(rate,getFX(ex,from=as.Date(d),to=as.Date(d),auto.assign = FALSE)[[1]])
+      thisdate = as.Date(d)
+      rate = c(rate,getFX(ex,from=thisdate,to=thisdate,auto.assign = FALSE)[[1]])
     }
   }
   period = as.factor(period)
