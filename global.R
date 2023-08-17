@@ -12,5 +12,5 @@ getCurrencies = function (){
 }
 
 getExchangeTable = function(kdp) {
-  exchangeTable = unique(kdp[,c('Exchange','Period','ExchangeDate','ExchangeRate')])
+  exchangeTable = unique(kdp[,c('Original Currency','Period End Date','Exchange Rate')])
 }

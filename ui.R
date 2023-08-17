@@ -6,15 +6,15 @@ navbarPage("Duncurra Royalty App",
            tabPanel("Home/Instructions",
                     titlePanel('Welcome to Duncurra Royalty App'),
                     p('This is a web based app that authors who publish through KDP can use to view sales and income.'),
-                    p('The app reads CSV (comma delimited) files. You can only download KDP prior month\'s royalties as XLS files, so you will need to open the file in Microsoft Excel and \"Save As\" a CSV file.'),
+                    p('The app reads XLSX (Microsoft Excel) files as downloaded from KDP'),
                     
                     h1('How to use:'),
                       h2('File Selection'),
-                        p('Click the File Selection tab and select the CSV file to upload. You can select single or multiple file(s) at a time. There is an option to \"sum over all periods in reports\". If you upload multiple files, and you want them all summed in the summary view, leave this box checked. You may uncheck it at any time to see summaries broken down by period (month).'),
+                        p('Click the File Selection tab and select the XLSX file to upload. You can select single or multiple file(s) at a time. There is an option to \"sum over all periods in reports\". If you upload multiple files, and you want them all summed in the summary view, leave this box checked. You may uncheck it at any time to see summaries broken down by period (month).'),
                       h2('Currency conversion'),
                         p('There is also a "desired currency" option on the file selection tab. The default is USD, but if Amazon pays you in another currency, you can select that here. After you select a file, the first thing you will see is the currency exchange rates. If you select reports from multiple months, you will see exchange rates for them all.'),
-                        p('To do currency conversions, the app will pull the currency conversion rate, from the 28th day of the month of when the royalties are paid, unless that date is in the future, in which case it will pull the conversion rate for yesterday.'),
-                        p('For example: Royalties from August sales are paid in October. When you use the app to look at the royalty report on September 23, it will calculate the currency conversion based on September 22 values. Every date on or after October 29, it will be reported on October 28 exchange rates.'),
+                        p('To do currency conversions, the app will pull the currency conversion rate, from the last day of the month of when the royalties are paid, unless that date is in the future, in which case it will pull the conversion rate for yesterday. Sales periods more than 180 days in the past will use the conversion rate from 180 days ago.'),
+                        p('For example: Royalties from August sales are paid in October. When you use the app to look at the royalty report on September 23, it will calculate the currency conversion based on September 22 values. Every date on or after October 29, it will be reported on October 31 exchange rates'),
                         p('Please note that this may not be the precise exchange rate used by the various Amazon outlets, but (aside from any extreme fluctuations) it should be close.'),
                     
                     
@@ -44,8 +44,8 @@ navbarPage("Duncurra Royalty App",
                     sidebarLayout(
                       sidebarPanel(
                         fileInput("file", 
-                                  "Choose KDP file saved as .csv",
-                                  accept=".csv",
+                                  "Choose KDP file saved as .xlsx",
+                                  accept=".xlsx",
                                   multiple = TRUE),
                         checkboxInput('sumperiods', 'Sum over all periods in reports?', TRUE),
                         selectInput('finalcurrency','Select Desired Currency',getCurrencies()$names)

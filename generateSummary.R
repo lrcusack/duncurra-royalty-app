@@ -8,16 +8,20 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
   }
   if (is.null(Titles)){
     Titles = unique(kdp$Title)
+    print('Titles')
+    print(Titles)
   }
   if(is.null(Periods)){
-    Periods = unique(kdp$Period)
+    Periods = unique(kdp$`Period End Date`)
   }
   ntitles = length(Titles)
   nauthors = length(Authors)
   nperiods = length(Periods)
   Royalty = c()
-  BookRoyalty = c()
-  BooksSold = c()
+  eBookRoyalty = c()
+  eBooksSold = c()
+  PaperbackRoyalty = c()
+  PaperbacksSold = c()
   KENPRoyalty = c()
   PagesRead = c()
   Title = c()
@@ -31,7 +35,7 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
       authoridx = kdp$Author==Authors[[j]]
       
       for (k in 1:nperiods){
-        periodidx = kdp$Period == Periods[[k]]
+        periodidx = kdp$`Period End Date` == Periods[[k]]
         idx = rep(TRUE,nrow(kdp))
         if (!sumauthors){
           idx = idx & authoridx
@@ -43,11 +47,13 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
           idx = idx & periodidx
         }
         if (any(idx)){
-          Royalty = c(Royalty,sum(kdp[idx,]$Royalty.inFinalCurrency))
-          BooksSold = c(BooksSold,sum(kdp[idx,]$NetUnitsSold,na.rm = TRUE))
-          PagesRead = c(PagesRead,sum(kdp[idx,]$KENPRead,na.rm = TRUE))
-          KENPRoyalty = c(KENPRoyalty,sum(kdp[(idx & !is.na(kdp$KENPRead)),]$Royalty.inFinalCurrency))
-          BookRoyalty = c(BookRoyalty,sum(kdp[(idx & !is.na(kdp$UnitsSold)),]$Royalty.inFinalCurrency))
+          Royalty = c(Royalty,sum(kdp[idx,]$`Royalty in Final Currency`))
+          eBooksSold = c(eBooksSold,sum(kdp[idx,]$`eBook Net Units Sold`,na.rm = TRUE))
+          PaperbacksSold = c(PaperbacksSold,sum(kdp[idx,]$`Paperback Net Units Sold`,na.rm = TRUE))
+          PagesRead = c(PagesRead,sum(kdp[idx,]$`Kindle Edition Normalized Page (KENP) Read`,na.rm = TRUE))
+          KENPRoyalty = c(KENPRoyalty,sum(kdp[(idx & !is.na(kdp$`Kindle Edition Normalized Page (KENP) Read`)),]$`Royalty in Final Currency`))
+          eBookRoyalty = c(eBookRoyalty,sum(kdp[(idx & !is.na(kdp$`eBook Net Units Sold`)),]$`Royalty in Final Currency`))
+          PaperbackRoyalty = c(PaperbackRoyalty,sum(kdp[(idx & !is.na(kdp$`Paperback Net Units Sold`)),]$`Royalty in Final Currency`))
           Title = c(Title,as.character(Titles[[i]]));
           Author = c(Author,as.character(Authors[[j]]))
           Period = c(Period,as.character(Periods[[k]]))
@@ -56,7 +62,7 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
       }
     }
   }
-  as = data.frame(Royalty,BookRoyalty,BooksSold,KENPRoyalty,PagesRead)
+  as = data.frame(Royalty,eBookRoyalty,eBooksSold,PaperbackRoyalty,PaperbacksSold,KENPRoyalty,PagesRead)
   
   if(!sumperiods){
     as$Period = Period
@@ -83,13 +89,17 @@ generateSummary <- function(kdp,Authors = NULL,Titles = NULL,Periods = NULL,
   as[nrow(as)+1,] = totalrow[1,]
   
   
-  colorder = intersect(c('Title','Author','Royalty','BookRoyalty',
-                         'BooksSold','KENPRoyalty','PagesRead','Period'),
+  colorder = intersect(c('Title','Author','Royalty',
+                         'eBookRoyalty', 'eBooksSold',
+                         'PaperbackRoyalty', 'PaperbacksSold',
+                         'KENPRoyalty','PagesRead',
+                         'Period'),
                        names(as))
   as = as[,colorder]
   
   
-  financeCols = c('Royalty','KENPRoyalty','BookRoyalty')
+  financeCols = c('Royalty','eBookRoyalty', 'PaperbackRoyalty', 'KENPRoyalty')
+  
   currSymbol = switch (currency,
     'USD' = '$',
     'NZD' = '$',

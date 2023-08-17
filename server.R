@@ -14,9 +14,12 @@ shinyServer(function(input, output, session) {
   })
   
   updatetitlelist = reactive({
-    titles = unique(kdp()[is.element(kdp()$Author,input$authorselect),'Title'])
+    if (is.null(input$authorselect))
+      titles = unique(kdp()[,'Title'])
+    else
+      titles = unique(kdp()[is.element(kdp()$Author,input$authorselect),'Title'])
     updateSelectInput(session,'titleselect',
-                      choices=setdiff(titles,'Total'),
+                      choices=setdiff(array(titles$Title),'Total'),
                       selected = input$titleselect)
   })
   
