@@ -14,7 +14,7 @@ navbarPage("Duncurra Royalty App",
                       h2('Currency conversion'),
                         p('There is also a "desired currency" option on the file selection tab. The default is USD, but if Amazon pays you in another currency, you can select that here. After you select a file, the first thing you will see is the currency exchange rates. If you select reports from multiple months, you will see exchange rates for them all.'),
                         p('To do currency conversions, the app will pull the currency conversion rate, from the last day of the month of when the royalties are paid, unless that date is in the future, in which case it will pull the conversion rate for yesterday. Sales periods more than 180 days in the past will use the conversion rate from 180 days ago.'),
-                        p('For example: Royalties from August sales are paid in October. When you use the app to look at the royalty report on September 23, it will calculate the currency conversion based on September 22 values. Every date on or after October 29, it will be reported on October 31 exchange rates'),
+                        p('For example: Royalties from August sales are paid in October. When you use the app to look at the royalty report on September 23, it will calculate the currency conversion based on September 22 values. Every date on or after November 1, it will be reported on October 31 exchange rates'),
                         p('Please note that this may not be the precise exchange rate used by the various Amazon outlets, but (aside from any extreme fluctuations) it should be close.'),
                     
                     
