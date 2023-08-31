@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
     else
       titles = unique(kdp()[is.element(kdp()$Author,input$authorselect),'Title'])
     updateSelectInput(session,'titleselect',
-                      choices=setdiff(array(titles$Title),'Total'),
+                      choices=setdiff(array(titles),'Total'),
                       selected = input$titleselect)
   })
   
@@ -56,7 +56,7 @@ shinyServer(function(input, output, session) {
     val = data.frame()
     ex = data.frame()
     for (path in inFile$datapath){
-      val = rbind(val,importKDPReport(path,finalCurrency = finalcurrency()))
+      val = rbind.fill(val,importKDPReport(path,finalCurrency = finalcurrency()))
     }
     
     updateSelectInput(session,'authorsummaryselect',

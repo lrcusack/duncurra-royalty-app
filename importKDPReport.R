@@ -7,13 +7,14 @@ library('dplyr')
 library('stringr')
 
 importKDPReport <- function(filename, finalCurrency = 'USD') {
-  period = str_match(
-    read_excel(
+  print(filename)
+  period = str_match(read_excel(
       filename, 
-      sheet='eBook Royalty Report'
-    )$Title[2], 
-    "Sales report for the period (\\w*) - (\\d*)"
-  )
+      sheet='Total Royalty',
+      range = cell_limits(c(1, 2), c(1, 2)), 
+      col_names = F
+  )$...1, "(\\w*) (\\d*)")
+
   report_date = make_date(
     as.integer(period[,3]), 
     match(substr(period[,2],0,3), month.abb)
@@ -35,11 +36,13 @@ importKDPReport <- function(filename, finalCurrency = 'USD') {
   numericColumns = c("Units Sold","Units Refunded","Net Units Sold or KENP Read",
                      "Royalty Type","List Price","Offer Price",
                      "Royalty in Original Currency")
-  factorColumns = c('Author', 'Marketplace', 'Original Currency', 'Transaction Type')
+  factorColumns = c('Author', 'Marketplace', 'Original Currency', 'Payout Plan')
   netColumns = c('Standard', 'Standard - Paperback')
   
   
-  result <- read_excel(filename, sheet = 'Combined Royalty Report') %>%
+  result <- read_excel(filename, 
+                       sheet = 'Total Royalty',
+                       range = cell_limits(c(2, NA), c(NA, NA))) %>%
     mutate(`Royalty Type` = str_replace(`Royalty Type`, "%", "")) %>%
     mutate(`Period End Date` = report_date) %>%
     rename(
@@ -47,13 +50,12 @@ importKDPReport <- function(filename, finalCurrency = 'USD') {
       `Offer Price` = `Avg. Offer Price without tax`,
       `Royalty in Original Currency` = `Royalty`,
       `Net Units Sold or KENP Read` = `Net Units Sold or KENP Read**`,
-      `Transaction Type` = `Transaction Type*`,
       `Original Currency` = `Currency`
     ) %>%
     mutate(across(all_of(numericColumns), as.numeric)) %>%
     mutate(across(all_of(factorColumns), as.factor)) %>%
     mutate(`Royalty Type` = `Royalty Type`/100) %>%
-    pivot_wider(names_from = `Transaction Type`, values_from = `Net Units Sold or KENP Read`) %>%
+    pivot_wider(names_from = `Payout Plan`, values_from = `Net Units Sold or KENP Read`) %>%
     rename(
       `eBook Net Units Sold` = `Standard`,
       `Paperback Net Units Sold` = `Standard - Paperback`,
